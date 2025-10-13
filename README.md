@@ -1,2 +1,15 @@
 # SustainBerlin
-SustainBerlin - web app dev Beleg 1
+
+**App-Name:** SustainBerlin  
+**Team:** Denis Olf (@diskodenso), <Teampartner>  
+**Matrikelnummer(n):** s0590296, <Matrikel Teampartner>
+
+## Kurzbeschreibung
+SustainBerlin ist ein webbasiertes Projekt, das nachhaltigkeitsrelevante Standorte in Berlin dokumentiert.
+
+Die Anwendung soll helfen, 
+1. Orte mit Verbesserungsbedarf zu identifizieren,  
+2. negative Einflüsse sichtbar zu machen und  
+3. fehlende nachhaltige Infrastruktur vorzuschlagen.
+
+Das Projekt wird als responsive **Single Page Application (SPA)** umgesetzt und später mit **Node.js**, **JavaScript** und **MongoDB** erweitert.
