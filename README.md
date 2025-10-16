@@ -1,8 +1,8 @@
 # SustainBerlin
 
 **App-Name:** SustainBerlin  
-**Team:** Denis Olf (@diskodenso), <Teampartner>  
-**Matrikelnummer(n):** s0590296, <Matrikel Teampartner>
+**Team:** Denis Olf (@diskodenso), Yehya Hussein  
+**Matrikelnummer(n):** s0590296, 587893
 
 ## Kurzbeschreibung
 SustainBerlin ist ein webbasiertes Projekt, das nachhaltigkeitsrelevante Standorte in Berlin dokumentiert.
