@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SustainBerlin – Prototype</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+<!-- LOGIN SCREEN -->
+<section class="screen" id="login">
+    <h1>SustainBerlin</h1>
+    <form>
+        <label>Username
+            <input type="text" required placeholder="Enter your username" />
+        </label>
+        <label>Password
+            <input type="password" required placeholder="Enter your password" />
+        </label>
+        <button type="button">Login</button>
+    </form>
+</section>
+
+<!-- MAIN SCREEN -->
+<section class="screen" id="main">
+    <header>
+        <h2>Welcome to SustainBerlin!</h2>
+        <div class="actions">
+            <button>Add</button>
+            <button>Logout</button>
+        </div>
+    </header>
+
+    <ul class="locations">
+        <li><strong>Tempelhofer Feld</strong> – Needs additional water stations</li>
+        <li><strong>Mauerpark</strong> – More recycling bins required</li>
+        <li><strong>Recyclinghof Reinickendorf</strong> – Accessibility could be improved</li>
+    </ul>
+
+    <footer>
+        <a href="#">Imprint</a> · <a href="#">Privacy Policy</a>
+    </footer>
+</section>
+
+<!-- ADD LOCATION SCREEN -->
+<section class="screen" id="add">
+    <h2>Add Location</h2>
+    <form>
+        <label>Location Name
+            <input type="text" placeholder="e.g. Frankfurter Allee Station" />
+        </label>
+        <label>District
+            <input type="text" placeholder="e.g. Friedrichshain-Kreuzberg" />
+        </label>
+        <label>Category
+            <select>
+                <option>Needs Improvement</option>
+                <option>Negative Impact</option>
+                <option>Missing Infrastructure</option>
+            </select>
+        </label>
+        <label>Description
+            <textarea rows="3" placeholder="Short description..."></textarea>
+        </label>
+        <label>Upload Image
+            <input type="file" accept="image/*" />
+        </label>
+        <div class="actions">
+            <button type="button">Save / Submit</button>
+            <button type="button">Cancel</button>
+        </div>
+    </form>
+</section>
+
+<!-- UPDATE/DELETE SCREEN -->
+<section class="screen" id="update">
+    <h2>Update / Delete Location</h2>
+    <form>
+        <label>Location Name
+            <input type="text" value="Tempelhofer Feld" />
+        </label>
+        <label>District
+            <input type="text" value="Tempelhof-Schöneberg" />
+        </label>
+        <label>Category
+            <select>
+                <option selected>Needs Improvement</option>
+                <option>Negative Impact</option>
+                <option>Missing Infrastructure</option>
+            </select>
+        </label>
+        <label>Description
+            <textarea rows="3">Add more shaded areas and drinking water stations.</textarea>
+        </label>
+        <figure>
+            <img src="img/example.jpg" alt="Tempelhofer Feld" />
+            <figcaption>Example image – Tempelhofer Feld</figcaption>
+        </figure>
+        <div class="actions">
+            <button type="button">Update</button>
+            <button type="button">Delete</button>
+            <button type="button">Cancel</button>
+        </div>
+    </form>
+</section>
+
+</body>
+</html>
