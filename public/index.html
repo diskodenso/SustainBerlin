@@ -34,9 +34,21 @@
     </header>
 
     <ul class="locations">
-        <li><strong>Tempelhofer Feld</strong> – Needs additional water stations</li>
-        <li><strong>Mauerpark</strong> – More recycling bins required</li>
-        <li><strong>Recyclinghof Reinickendorf</strong> – Accessibility could be improved</li>
+        <li>
+            <strong>Tempelhofer Feld</strong><br />
+            Tempelhofer Damm, 12101 Berlin<br />
+            <img src="img/tempelhof.jpg" alt="Tempelhofer Feld" />
+        </li>
+        <li>
+            <strong>Mauerpark</strong><br />
+            Bernauer Str. 63-64, 13355 Berlin<br />
+            <img src="img/mauerpark.jpg" alt="Mauerpark" />
+        </li>
+        <li>
+            <strong>Recyclinghof Reinickendorf</strong><br />
+            Lengeder Str. 6, 13407 Berlin<br />
+            <img src="img/recycling.jpg" alt="Recyclinghof Reinickendorf" />
+        </li>
     </ul>
 
     <footer>
@@ -48,54 +60,73 @@
 <section class="screen" id="add">
     <h2>Add Location</h2>
     <form>
-        <label>Location Name
-            <input type="text" placeholder="e.g. Frankfurter Allee Station" />
-        </label>
-        <label>District
-            <input type="text" placeholder="e.g. Friedrichshain-Kreuzberg" />
-        </label>
-        <label>Category
-            <select>
-                <option>Needs Improvement</option>
-                <option>Negative Impact</option>
-                <option>Missing Infrastructure</option>
-            </select>
+        <label>Title *
+            <input type="text" required placeholder="e.g. Frankfurter Allee Station" />
         </label>
         <label>Description
             <textarea rows="3" placeholder="Short description..."></textarea>
+        </label>
+        <label>Street & Number *
+            <input type="text" required placeholder="e.g. Frankfurter Allee 44" />
+        </label>
+        <label>Postal Code & City *
+            <input type="text" required placeholder="e.g. 10247 Berlin" />
+        </label>
+        <label>Category *
+            <select required>
+                <option value="">Select a category...</option>
+                <option>Bicycle (paths, parking)</option>
+                <option>Public Transport</option>
+                <option>Pedestrians</option>
+                <option>Road Traffic (construction, congestion)</option>
+                <option>Air Quality</option>
+                <option>Industrial Facilities</option>
+            </select>
         </label>
         <label>Upload Image
             <input type="file" accept="image/*" />
         </label>
         <div class="actions">
-            <button type="button">Save / Submit</button>
+            <button type="button">Save</button>
             <button type="button">Cancel</button>
         </div>
     </form>
 </section>
 
-<!-- UPDATE/DELETE SCREEN -->
-<section class="screen" id="update">
+<!-- DETAILS / UPDATE / DELETE SCREEN -->
+<section class="screen" id="details">
     <h2>Update / Delete Location</h2>
     <form>
-        <label>Location Name
-            <input type="text" value="Tempelhofer Feld" />
-        </label>
-        <label>District
-            <input type="text" value="Tempelhof-Schöneberg" />
-        </label>
-        <label>Category
-            <select>
-                <option selected>Needs Improvement</option>
-                <option>Negative Impact</option>
-                <option>Missing Infrastructure</option>
-            </select>
+        <label>Title *
+            <input type="text" required value="Tempelhofer Feld" />
         </label>
         <label>Description
-            <textarea rows="3">Add more shaded areas and drinking water stations.</textarea>
+            <textarea rows="3">Large open park with potential for more shade and water stations.</textarea>
+        </label>
+        <label>Street & Number *
+            <input type="text" required value="Tempelhofer Damm" />
+        </label>
+        <label>Postal Code & City *
+            <input type="text" required value="12101 Berlin" />
+        </label>
+        <label>Category *
+            <select required>
+                <option selected>Air Quality</option>
+                <option>Bicycle (paths, parking)</option>
+                <option>Public Transport</option>
+                <option>Pedestrians</option>
+                <option>Road Traffic (construction, congestion)</option>
+                <option>Industrial Facilities</option>
+            </select>
+        </label>
+        <label>Latitude
+            <input type="text" readonly value="52.473" />
+        </label>
+        <label>Longitude
+            <input type="text" readonly value="13.403" />
         </label>
         <figure>
-            <img src="img/example.jpg" alt="Tempelhofer Feld" />
+            <img src="img/tempelhof.jpg" alt="Tempelhofer Feld" />
             <figcaption>Example image – Tempelhofer Feld</figcaption>
         </figure>
         <div class="actions">
