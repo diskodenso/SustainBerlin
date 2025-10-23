@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SustainBerlin – Prototype</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+<!-- LOGIN SCREEN -->
+<section class="screen" id="login">
+    <h1>SustainBerlin</h1>
+    <form>
+        <label>Username
+            <input type="text" required placeholder="Enter your username" />
+        </label>
+        <label>Password
+            <input type="password" required placeholder="Enter your password" />
+        </label>
+        <button type="button">Login</button>
+    </form>
+</section>
+
+<!-- MAIN SCREEN -->
+<section class="screen" id="main">
+    <header>
+        <h2>Welcome to SustainBerlin!</h2>
+        <div class="actions">
+            <button>Add</button>
+            <button>Logout</button>
+        </div>
+    </header>
+
+    <ul class="locations">
+        <li>
+            <strong>Tempelhofer Feld</strong><br />
+            Tempelhofer Damm, 12101 Berlin<br />
+            <img src="img/tempelhof.jpg" alt="Tempelhofer Feld" />
+        </li>
+        <li>
+            <strong>Mauerpark</strong><br />
+            Bernauer Str. 63-64, 13355 Berlin<br />
+            <img src="img/mauerpark.jpg" alt="Mauerpark" />
+        </li>
+        <li>
+            <strong>Recyclinghof Reinickendorf</strong><br />
+            Lengeder Str. 6, 13407 Berlin<br />
+            <img src="img/recycling.jpg" alt="Recyclinghof Reinickendorf" />
+        </li>
+    </ul>
+
+    <footer>
+        <a href="#">Imprint</a> · <a href="#">Privacy Policy</a>
+    </footer>
+</section>
+
+<!-- ADD LOCATION SCREEN -->
+<section class="screen" id="add">
+    <h2>Add Location</h2>
+    <form>
+        <label>Title *
+            <input type="text" required placeholder="e.g. Frankfurter Allee Station" />
+        </label>
+        <label>Description
+            <textarea rows="3" placeholder="Short description..."></textarea>
+        </label>
+        <label>Street & Number *
+            <input type="text" required placeholder="e.g. Frankfurter Allee 44" />
+        </label>
+        <label>Postal Code & City *
+            <input type="text" required placeholder="e.g. 10247 Berlin" />
+        </label>
+        <label>Category *
+            <select required>
+                <option value="">Select a category...</option>
+                <option>Bicycle (paths, parking)</option>
+                <option>Public Transport</option>
+                <option>Pedestrians</option>
+                <option>Road Traffic (construction, congestion)</option>
+                <option>Air Quality</option>
+                <option>Industrial Facilities</option>
+            </select>
+        </label>
+        <label>Upload Image
+            <input type="file" accept="image/*" />
+        </label>
+        <div class="actions">
+            <button type="button">Save</button>
+            <button type="button">Cancel</button>
+        </div>
+    </form>
+</section>
+
+<!-- DETAILS / UPDATE / DELETE SCREEN -->
+<section class="screen" id="details">
+    <h2>Update / Delete Location</h2>
+    <form>
+        <label>Title *
+            <input type="text" required value="Tempelhofer Feld" />
+        </label>
+        <label>Description
+            <textarea rows="3">Large open park with potential for more shade and water stations.</textarea>
+        </label>
+        <label>Street & Number *
+            <input type="text" required value="Tempelhofer Damm" />
+        </label>
+        <label>Postal Code & City *
+            <input type="text" required value="12101 Berlin" />
+        </label>
+        <label>Category *
+            <select required>
+                <option selected>Air Quality</option>
+                <option>Bicycle (paths, parking)</option>
+                <option>Public Transport</option>
+                <option>Pedestrians</option>
+                <option>Road Traffic (construction, congestion)</option>
+                <option>Industrial Facilities</option>
+            </select>
+        </label>
+        <label>Latitude
+            <input type="text" readonly value="52.473" />
+        </label>
+        <label>Longitude
+            <input type="text" readonly value="13.403" />
+        </label>
+        <figure>
+            <img src="img/tempelhof.jpg" alt="Tempelhofer Feld" />
+            <figcaption>Example image – Tempelhofer Feld</figcaption>
+        </figure>
+        <div class="actions">
+            <button type="button">Update</button>
+            <button type="button">Delete</button>
+            <button type="button">Cancel</button>
+        </div>
+    </form>
+</section>
+
+</body>
+</html>
