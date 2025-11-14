@@ -9,133 +9,134 @@
 
 <body>
 
-<!-- LOGIN SCREEN -->
-<section class="screen" id="login">
+<!-- GLOBAL HEADER -->
+<header class="global-header">
     <h1>SustainBerlin</h1>
-    <form>
-        <label>Username
-            <input type="text" required placeholder="Enter your username" />
-        </label>
-        <label>Password
-            <input type="password" required placeholder="Enter your password" />
-        </label>
-        <button type="button">Login</button>
-    </form>
-</section>
+</header>
 
-<!-- MAIN SCREEN -->
-<section class="screen" id="main">
-    <header>
-        <h2>Welcome to SustainBerlin!</h2>
-        <div class="actions">
-            <button>Add</button>
-            <button>Logout</button>
+<!-- MAIN APP AREA (SPA ROOT) -->
+<main id="app">
+
+    <!-- LOGIN SCREEN -->
+    <section class="screen" id="login">
+        <form>
+            <label>Username
+                <input type="text" id="login-username" required placeholder="Enter your username"/>
+            </label>
+            <label>Password
+                <input type="password" id="login-password" required placeholder="Enter your password" />
+            </label>
+            <button type="button" id="login-btn">Login</button>
+        </form>
+    </section>
+
+    <!-- MAIN SCREEN -->
+    <section class="screen" id="main">
+        <h2 id="welcome-text">Welcome!</h2>
+
+        <div class="actions" id="main-actions">
+            <!-- Admin gets Add + Logout -->
+            <!-- Normal user gets only Logout -->
         </div>
-    </header>
 
-    <ul class="locations">
-        <li>
-            <strong>Tempelhofer Feld</strong><br />
-            Tempelhofer Damm, 12101 Berlin<br />
-            <img src="assets/img/tempelhof.jpg" alt="Tempelhofer Feld" />
-        </li>
-        <li>
-            <strong>Mauerpark</strong><br />
-            Bernauer Str. 63-64, 13355 Berlin<br />
-            <img src="assets/img/mauerpark.jpg" alt="Mauerpark" />
-        </li>
-        <li>
-            <strong>Recyclinghof Reinickendorf</strong><br />
-            Lengeder Str. 6, 13407 Berlin<br />
-            <img src="assets/img/recycling.jpg" alt="Recyclinghof Reinickendorf" />
-        </li>
-    </ul>
+        <ul class="locations" id="location-list">
+            <!-- Filled dynamically -->
+        </ul>
+    </section>
 
-    <footer>
-        <a href="#">Imprint</a> · <a href="#">Privacy Policy</a>
-    </footer>
-</section>
+    <!-- ADD LOCATION SCREEN -->
+    <section class="screen" id="add">
+        <h2>Add Location</h2>
+        <form id="add-form">
+            <label>Title *
+                <input type="text" name="title" required />
+            </label>
+            <label>Description
+                <textarea name="description" rows="3"></textarea>
+            </label>
+            <label>Street & Number *
+                <input type="text" name="street" required />
+            </label>
+            <label>Postal Code & City *
+                <input type="text" name="zipcity" required />
+            </label>
+            <label>Category *
+                <select name="category" required>
+                    <option value="">Select a category...</option>
+                    <option>Bicycle (paths, parking)</option>
+                    <option>Public Transport</option>
+                    <option>Pedestrians</option>
+                    <option>Road Traffic (construction, congestion)</option>
+                    <option>Air Quality</option>
+                    <option>Industrial Facilities</option>
+                </select>
+            </label>
+            <label>Image URL
+                <input type="text" name="image" placeholder="assets/img/..."/>
+            </label>
 
-<!-- ADD LOCATION SCREEN -->
-<section class="screen" id="add">
-    <h2>Add Location</h2>
-    <form>
-        <label>Title *
-            <input type="text" required placeholder="e.g. Frankfurter Allee Station" />
-        </label>
-        <label>Description
-            <textarea rows="3" placeholder="Short description..."></textarea>
-        </label>
-        <label>Street & Number *
-            <input type="text" required placeholder="e.g. Frankfurter Allee 44" />
-        </label>
-        <label>Postal Code & City *
-            <input type="text" required placeholder="e.g. 10247 Berlin" />
-        </label>
-        <label>Category *
-            <select required>
-                <option value="">Select a category...</option>
-                <option>Bicycle (paths, parking)</option>
-                <option>Public Transport</option>
-                <option>Pedestrians</option>
-                <option>Road Traffic (construction, congestion)</option>
-                <option>Air Quality</option>
-                <option>Industrial Facilities</option>
-            </select>
-        </label>
-        <label>Upload Image
-            <input type="file" accept="image/*" />
-        </label>
-        <div class="actions">
-            <button type="button">Save</button>
-            <button type="button">Cancel</button>
-        </div>
-    </form>
-</section>
+            <div class="actions">
+                <button type="button" id="add-save">Save</button>
+                <button type="button" id="add-cancel">Cancel</button>
+            </div>
+        </form>
+    </section>
 
-<!-- DETAILS / UPDATE / DELETE SCREEN -->
-<section class="screen" id="details">
-    <h2>Update / Delete Location</h2>
-    <form>
-        <label>Title *
-            <input type="text" required value="Tempelhofer Feld" />
-        </label>
-        <label>Description
-            <textarea rows="3">Large open park with potential for more shade and water stations.</textarea>
-        </label>
-        <label>Street & Number *
-            <input type="text" required value="Tempelhofer Damm" />
-        </label>
-        <label>Postal Code & City *
-            <input type="text" required value="12101 Berlin" />
-        </label>
-        <label>Category *
-            <select required>
-                <option selected>Air Quality</option>
-                <option>Bicycle (paths, parking)</option>
-                <option>Public Transport</option>
-                <option>Pedestrians</option>
-                <option>Road Traffic (construction, congestion)</option>
-                <option>Industrial Facilities</option>
-            </select>
-        </label>
-        <label>Latitude
-            <input type="text" readonly value="52.473" />
-        </label>
-        <label>Longitude
-            <input type="text" readonly value="13.403" />
-        </label>
-        <figure>
-            <img src="img/tempelhof.jpg" alt="Tempelhofer Feld" />
-            <figcaption>Example image – Tempelhofer Feld</figcaption>
-        </figure>
-        <div class="actions">
-            <button type="button">Update</button>
-            <button type="button">Delete</button>
-            <button type="button">Cancel</button>
-        </div>
-    </form>
-</section>
+    <!-- DETAILS SCREEN -->
+    <section class="screen" id="details">
+        <h2>Location Details</h2>
+        <form id="details-form">
+            <label>Title *
+                <input name="title" required />
+            </label>
+            <label>Description
+                <textarea name="description" rows="3"></textarea>
+            </label>
+            <label>Street & Number *
+                <input name="street" required />
+            </label>
+            <label>Postal Code & City *
+                <input name="zipcity" required />
+            </label>
+            <label>Category *
+                <select name="category" required>
+                    <option>Bicycle (paths, parking)</option>
+                    <option>Public Transport</option>
+                    <option>Pedestrians</option>
+                    <option>Road Traffic (construction, congestion)</option>
+                    <option>Air Quality</option>
+                    <option>Industrial Facilities</option>
+                </select>
+            </label>
+
+            <label>Latitude
+                <input name="lat" readonly />
+            </label>
+            <label>Longitude
+                <input name="lon" readonly />
+            </label>
+
+            <figure>
+                <img id="details-img" alt="Preview" />
+                <figcaption id="details-caption"></figcaption>
+            </figure>
+
+            <div class="actions" id="details-actions">
+                <!-- Admin: Update + Delete + Cancel -->
+                <!-- Normal: Close -->
+            </div>
+        </form>
+    </section>
+
+</main>
+
+<!-- GLOBAL FOOTER -->
+<footer class="global-footer">
+    <a href="#">Imprint</a> ·
+    <a href="#">Privacy Policy</a>
+</footer>
+
+<script src="app.js"></script>
 
 </body>
 </html>
