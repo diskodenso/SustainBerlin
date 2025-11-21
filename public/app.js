@@ -82,6 +82,8 @@ function handleLogin() {
 // MAIN SCREEN RENDERING
 // -------------------------------
 function renderMainScreen() {
+    if (!currentUser) return;
+
     // Welcome text
     document.getElementById("welcome-text").textContent = `Hello ${currentUser.name}!`;
 
@@ -91,6 +93,7 @@ function renderMainScreen() {
 
     if (currentUser.role === "admin") {
         const addBtn = document.createElement("button");
+        addBtn.type = "button";
         addBtn.textContent = "Add";
         addBtn.onclick = () => {
             clearAddForm();
@@ -100,6 +103,7 @@ function renderMainScreen() {
     }
 
     const logoutBtn = document.createElement("button");
+    logoutBtn.type = "button";
     logoutBtn.textContent = "Logout";
     logoutBtn.onclick = logout;
     actions.appendChild(logoutBtn);
@@ -113,6 +117,7 @@ function renderMainScreen() {
         li.innerHTML = `
             <strong>${loc.title}</strong><br/>
             ${loc.street}, ${loc.zipcity}<br/>
+            ${loc.category}<br/>
             ${loc.image ? `<img src="${loc.image}" />` : ""}
         `;
         li.onclick = () => openDetails(loc.id);
@@ -141,6 +146,15 @@ function openDetails(id) {
 
     const form = document.getElementById("details-form");
 
+    // immer erstmal alles wieder aktivieren
+    [...form.querySelectorAll("input, textarea, select")].forEach(i => {
+        i.disabled = false;
+        if (i.readOnly) {
+            // readOnly bleibt readOnly
+            i.disabled = false;
+        }
+    });
+
     form.title.value = loc.title;
     form.description.value = loc.description;
     form.street.value = loc.street;
@@ -156,27 +170,31 @@ function openDetails(id) {
     const actions = document.getElementById("details-actions");
     actions.innerHTML = "";
 
-    if (currentUser.role === "admin") {
+    if (currentUser && currentUser.role === "admin") {
         // Update
         const updateBtn = document.createElement("button");
+        updateBtn.type = "button";
         updateBtn.textContent = "Update";
         updateBtn.onclick = updateLocation;
         actions.appendChild(updateBtn);
 
         // Delete
         const del = document.createElement("button");
+        del.type = "button";
         del.textContent = "Delete";
         del.onclick = deleteLocation;
         actions.appendChild(del);
 
         // Cancel
         const cancel = document.createElement("button");
+        cancel.type = "button";
         cancel.textContent = "Cancel";
         cancel.onclick = () => showScreen("main");
         actions.appendChild(cancel);
     } else {
         // Normal user -> only close
         const close = document.createElement("button");
+        close.type = "button";
         close.textContent = "Close";
         close.onclick = () => showScreen("main");
         actions.appendChild(close);
@@ -208,12 +226,14 @@ async function updateLocation() {
     const form = document.getElementById("details-form");
     const loc = locations.find(l => l.id === currentDetailsId);
 
+    if (!loc) return;
+
     // read values
-    loc.title = form.title.value;
-    loc.description = form.description.value;
-    loc.street = form.street.value;
-    loc.zipcity = form.zipcity.value;
-    loc.category = form.category.value;
+    loc.title = form.title.value.trim();
+    loc.description = form.description.value.trim();
+    loc.street = form.street.value.trim();
+    loc.zipcity = form.zipcity.value.trim();
+    loc.category = form.category.value.trim();
 
     // geocode new address
     const addr = `${loc.street}, ${loc.zipcity}`;
@@ -277,6 +297,7 @@ async function saveNewLocation() {
         lon: geo.lon
     });
 
+    f.reset();
     renderMainScreen();
     showScreen("main");
 }
@@ -308,9 +329,22 @@ window.onload = () => {
     // hide all except login
     showScreen("login");
 
-    // event listeners
-    document.getElementById("login-btn").onclick = handleLogin;
+    // Login über Formular-Submit
+    const loginForm = document.getElementById("login-form");
+    loginForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        handleLogin();
+    });
 
-    document.getElementById("add-save").onclick = saveNewLocation;
-    document.getElementById("add-cancel").onclick = () => showScreen("main");
+    // Add-Form über Formular-Submit
+    const addForm = document.getElementById("add-form");
+    addForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        await saveNewLocation();
+    });
+
+    // Cancel im Add-Screen
+    document.getElementById("add-cancel").addEventListener("click", () => {
+        showScreen("main");
+    });
 };
