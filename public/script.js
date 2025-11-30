@@ -160,6 +160,7 @@ function openDetails(id) {
     form.street.value = loc.street;
     form.zipcity.value = loc.zipcity;
     form.category.value = loc.category;
+    form.image.value = loc.image || "";
     form.lat.value = loc.lat;
     form.lon.value = loc.lon;
 
@@ -228,53 +229,45 @@ async function updateLocation() {
 
     if (!loc) return;
 
-    const title = form.title.value.trim();
-    const description = form.description.value.trim();
-    const street = form.street.value.trim();
-    const zipcity = form.zipcity.value.trim();
-    const category = form.category.value.trim();
+    // read values into temp variables
+    const newTitle = form.title.value.trim();
+    const newDesc = form.description.value.trim();
+    const newStreet = form.street.value.trim();
+    const newZip = form.zipcity.value.trim();
+    const newCat = form.category.value.trim();
+    const newImage = form.image.value.trim();
 
-    if (!title || !street || !zipcity || !category) {
-        alert("Please fill in all required fields.");
+    // Validate Input
+    const validation = validateAddressInput(newStreet, newZip);
+    if (!validation.valid) {
+        alert(validation.error);
         return;
     }
-
-    // Validate address format (must contain "Berlin" and valid postal code)
-    if (!isValidBerlinAddress(zipcity)) {
-        alert("Address must be in Berlin. Please use format: '12101 Berlin' (postal code starting with 1, 5 digits)");
-        return;
-    }
-
-    // Validate street format (name + number)
-    if (!isValidStreetFormat(street)) {
-        alert("Street format invalid. Please use format: 'Street Name 123'");
-        return;
-    }
-
-    // Update values
-    loc.title = title;
-    loc.description = description;
-    loc.street = street;
-    loc.zipcity = zipcity;
-    loc.category = category;
 
     // geocode new address
-    const addr = `${loc.street}, ${loc.zipcity}`;
+    const addr = `${newStreet}, ${newZip}`;
 
+    let geo;
     try {
-        const geo = await geocodeAddress(addr);
-        loc.lat = geo.lat;
-        loc.lon = geo.lon;
+        geo = await geocodeAddress(addr);
     } catch (err) {
-        // Use fallback coordinates for Berlin center if geocoding fails
-        loc.lat = 52.52;
-        loc.lon = 13.405;
+        alert(err.message);
+        return;
     }
+
+    // Update location only after success
+    loc.title = newTitle;
+    loc.description = newDesc;
+    loc.street = newStreet;
+    loc.zipcity = newZip;
+    loc.category = newCat;
+    loc.image = newImage;
+    loc.lat = geo.lat;
+    loc.lon = geo.lon;
 
     renderMainScreen();
     showScreen("main");
 }
-
 
 
 // -------------------------------
@@ -300,29 +293,20 @@ async function saveNewLocation() {
         return;
     }
 
-    // Validate address format (must contain "Berlin" and valid postal code)
-    if (!isValidBerlinAddress(zipcity)) {
-        alert("Address must be in Berlin. Please use format: '12101 Berlin' (postal code starting with 1, 5 digits)");
-        return;
-    }
-
-    // Validate street format (name + number)
-    if (!isValidStreetFormat(street)) {
-        alert("Street format invalid. Please use format: 'Street Name 123'");
-        return;
-    }
-
     const addr = `${street}, ${zipcity}`;
+
+    const validation = validateAddressInput(street, zipcity);
+    if (!validation.valid) {
+        alert(validation.error);
+        return;
+    }
 
     let geo;
     try {
         geo = await geocodeAddress(addr);
     } catch (err) {
-        // Use fallback coordinates for Berlin center if geocoding fails
-        geo = {
-            lat: 52.52,
-            lon: 13.405
-        };
+        alert(err.message);
+        return;
     }
 
     locations.push({
@@ -344,39 +328,64 @@ async function saveNewLocation() {
 
 
 // -------------------------------
-// ADDRESS VALIDATION
+// GEOCODING FUNCTION (Nominatim API)
 // -------------------------------
-function isValidBerlinAddress(zipcity) {
-    // Check if address contains "Berlin" and validate postal code format
-    const lowerZipcity = zipcity.toLowerCase();
-    if (!lowerZipcity.includes("berlin")) {
-        return false;
-    }
-
-    // Extract postal code (5 digits starting with 1)
-    const plzMatch = zipcity.match(/\b1\d{4}\b/);
-    return plzMatch !== null;
-}
-
-function isValidStreetFormat(street) {
-    // Check that street contains anything followed by space and a number
-    // Very lenient format
-    const streetPattern = /^.+\s+\d+$/;
-    return streetPattern.test(street.trim());
-}
 async function geocodeAddress(address) {
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
+    // Request addressdetails=1 to get structured data (city, postcode, etc.)
+    const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(address)}`;
 
     const res = await fetch(url, { headers: { "Accept-Language": "de" } });
-    if (!res.ok) throw new Error("network error");
+    if (!res.ok) throw new Error("Network error accessing Geocoding service.");
 
     const data = await res.json();
-    if (!data.length) throw new Error("no results");
+    if (!data.length) throw new Error("No results found for this address.");
+
+    // Filter: Check if it's in Berlin AND PLZ starts with '1'
+    const berlinMatch = data.find(item => {
+        const a = item.address;
+        if (!a) return false;
+
+        // 1. Check for "Berlin" in state/city/town/village
+        // Note: In Nominatim, Berlin is usually the state (Bundesland) and city.
+        const isBerlin = (
+            (a.state && a.state.includes("Berlin")) ||
+            (a.city && a.city.includes("Berlin")) ||
+            (a.town && a.town.includes("Berlin"))
+        );
+
+        // 2. Check PLZ starts with "1" (Berlin PLZ range is approx 10xxx - 14xxx)
+        const validPLZ = a.postcode && a.postcode.startsWith("1");
+
+        return isBerlin && validPLZ;
+    });
+
+    if (!berlinMatch) {
+        throw new Error("Location must be in Berlin (PLZ starting with 1).");
+    }
 
     return {
-        lat: parseFloat(data[0].lat),
-        lon: parseFloat(data[0].lon)
+        lat: parseFloat(berlinMatch.lat),
+        lon: parseFloat(berlinMatch.lon)
     };
+}
+
+function validateAddressInput(street, zipcity) {
+    // 1. Check for House Number (at least one digit in street)
+    if (!/\d/.test(street)) {
+        return { valid: false, error: "Please enter a house number in the street field." };
+    }
+
+    // 2. Check for "Berlin" (case-insensitive)
+    if (!/Berlin/i.test(zipcity)) {
+        return { valid: false, error: "City must be 'Berlin'." };
+    }
+
+    // 3. Check for PLZ starting with 1 (5 digits)
+    if (!/\b1\d{4}\b/.test(zipcity)) {
+        return { valid: false, error: "Postal code must start with '1' (Berlin code)." };
+    }
+
+    return { valid: true };
 }
 
 

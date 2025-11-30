@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -9,134 +10,139 @@
 
 <body>
 
-<!-- GLOBAL HEADER -->
-<header class="global-header">
-    <h1>SustainBerlin</h1>
-</header>
+    <!-- GLOBAL HEADER -->
+    <header class="global-header">
+        <h1>SustainBerlin</h1>
+    </header>
 
-<!-- MAIN APP AREA (SPA ROOT) -->
-<main id="app">
+    <!-- MAIN APP AREA (SPA ROOT) -->
+    <main id="app">
 
-    <!-- LOGIN SCREEN -->
-    <section class="screen" id="login">
-        <form id="login-form">
-            <label>Username
-                <input type="text" id="login-username" required placeholder="Enter your username"/>
-            </label>
-            <label>Password
-                <input type="password" id="login-password" required placeholder="Enter your password" />
-            </label>
-            <button type="submit" id="login-btn">Login</button>
-        </form>
-    </section>
+        <!-- LOGIN SCREEN -->
+        <section class="screen" id="login">
+            <form id="login-form">
+                <label>Username
+                    <input type="text" id="login-username" required placeholder="Enter your username" />
+                </label>
+                <label>Password
+                    <input type="password" id="login-password" required placeholder="Enter your password" />
+                </label>
+                <button type="submit" id="login-btn">Login</button>
+            </form>
+        </section>
 
-    <!-- MAIN SCREEN -->
-    <section class="screen" id="main">
-        <h2 id="welcome-text">Welcome!</h2>
+        <!-- MAIN SCREEN -->
+        <section class="screen" id="main">
+            <h2 id="welcome-text">Welcome!</h2>
 
-        <div class="actions" id="main-actions">
-            <!-- Admin gets Add + Logout -->
-            <!-- Normal user gets only Logout -->
-        </div>
-
-        <ul class="locations" id="location-list">
-            <!-- Filled dynamically -->
-        </ul>
-    </section>
-
-    <!-- ADD LOCATION SCREEN -->
-    <section class="screen" id="add">
-        <h2>Add Location</h2>
-        <form id="add-form">
-            <label>Title *
-                <input type="text" name="title" required />
-            </label>
-            <label>Description
-                <textarea name="description" rows="3"></textarea>
-            </label>
-            <label>Street & Number *
-                <input type="text" name="street" required />
-            </label>
-            <label>Postal Code & City *
-                <input type="text" name="zipcity" required />
-            </label>
-            <label>Category *
-                <select name="category" required>
-                    <option value="">Select a category...</option>
-                    <option>Bicycle (paths, parking)</option>
-                    <option>Public Transport</option>
-                    <option>Pedestrians</option>
-                    <option>Road Traffic (construction, congestion)</option>
-                    <option>Air Quality</option>
-                    <option>Industrial Facilities</option>
-                </select>
-            </label>
-            <label>Image URL
-                <input type="text" name="image" placeholder="assets/img/..."/>
-            </label>
-
-            <div class="actions">
-                <button type="submit" id="add-save">Save</button>
-                <button type="button" id="add-cancel">Cancel</button>
+            <div class="actions" id="main-actions">
+                <!-- Admin gets Add + Logout -->
+                <!-- Normal user gets only Logout -->
             </div>
-        </form>
-    </section>
 
-    <!-- DETAILS SCREEN -->
-    <section class="screen" id="details">
-        <h2>Location Details</h2>
-        <form id="details-form">
-            <label>Title *
-                <input name="title" required />
-            </label>
-            <label>Description
-                <textarea name="description" rows="3"></textarea>
-            </label>
-            <label>Street & Number *
-                <input name="street" required />
-            </label>
-            <label>Postal Code & City *
-                <input name="zipcity" required />
-            </label>
-            <label>Category *
-                <select name="category" required>
-                    <option>Bicycle (paths, parking)</option>
-                    <option>Public Transport</option>
-                    <option>Pedestrians</option>
-                    <option>Road Traffic (construction, congestion)</option>
-                    <option>Air Quality</option>
-                    <option>Industrial Facilities</option>
-                </select>
-            </label>
+            <ul class="locations" id="location-list">
+                <!-- Filled dynamically -->
+            </ul>
+        </section>
 
-            <label>Latitude
-                <input name="lat" readonly />
-            </label>
-            <label>Longitude
-                <input name="lon" readonly />
-            </label>
+        <!-- ADD LOCATION SCREEN -->
+        <section class="screen" id="add">
+            <h2>Add Location</h2>
+            <form id="add-form">
+                <label>Title *
+                    <input type="text" name="title" required />
+                </label>
+                <label>Description
+                    <textarea name="description" rows="3"></textarea>
+                </label>
+                <label>Street & Number *
+                    <input type="text" name="street" required />
+                </label>
+                <label>Postal Code & City *
+                    <input type="text" name="zipcity" required />
+                </label>
+                <label>Category *
+                    <select name="category" required>
+                        <option value="">Select a category...</option>
+                        <option>Bicycle (paths, parking)</option>
+                        <option>Public Transport</option>
+                        <option>Pedestrians</option>
+                        <option>Road Traffic (construction, congestion)</option>
+                        <option>Air Quality</option>
+                        <option>Industrial Facilities</option>
+                    </select>
+                </label>
+                <label>Image URL
+                    <input type="text" name="image" placeholder="assets/img/..." />
+                </label>
 
-            <figure>
-                <img id="details-img" alt="Preview" />
-                <figcaption id="details-caption"></figcaption>
-            </figure>
+                <div class="actions">
+                    <button type="submit" id="add-save">Save</button>
+                    <button type="button" id="add-cancel">Cancel</button>
+                </div>
+            </form>
+        </section>
 
-            <div class="actions" id="details-actions">
-                <!-- Admin: Update + Delete + Cancel -->
-                <!-- Normal: Close -->
-            </div>
-        </form>
-    </section>
+        <!-- DETAILS SCREEN -->
+        <section class="screen" id="details">
+            <h2>Location Details</h2>
+            <form id="details-form">
+                <label>Title *
+                    <input name="title" required />
+                </label>
+                <label>Description
+                    <textarea name="description" rows="3"></textarea>
+                </label>
+                <label>Street & Number *
+                    <input name="street" required />
+                </label>
+                <label>Postal Code & City *
+                    <input name="zipcity" required />
+                </label>
+                <label>Category *
+                    <select name="category" required>
+                        <option>Bicycle (paths, parking)</option>
+                        <option>Public Transport</option>
+                        <option>Pedestrians</option>
+                        <option>Road Traffic (construction, congestion)</option>
+                        <option>Air Quality</option>
+                        <option>Industrial Facilities</option>
+                    </select>
+                </label>
 
-</main>
+                <label>Image URL
+                    <input type="text" name="image" placeholder="assets/img/..." />
+                </label>
 
-<!-- GLOBAL FOOTER -->
-<footer class="global-footer">
-    <a href="#">Imprint</a> ·
-    <a href="#">Privacy Policy</a>
-</footer>
+                <label>Latitude
+                    <input name="lat" readonly />
+                </label>
+                <label>Longitude
+                    <input name="lon" readonly />
+                </label>
 
-<script src="app.js"></script>
+                <figure>
+                    <img id="details-img" alt="Preview" />
+                    <figcaption id="details-caption"></figcaption>
+                </figure>
+
+                <div class="actions" id="details-actions">
+                    <!-- Admin: Update + Delete + Cancel -->
+                    <!-- Normal: Close -->
+                </div>
+            </form>
+        </section>
+
+    </main>
+
+    <!-- GLOBAL FOOTER -->
+    <footer class="global-footer">
+        <a href="#">Imprint</a> ·
+        <a href="#">Privacy Policy</a>
+    </footer>
+
+    <script src="script.js"></script>
 
 </body>
+
 </html>
