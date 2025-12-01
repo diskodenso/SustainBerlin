@@ -249,7 +249,7 @@ async function updateLocation() {
 
     let geo;
     try {
-        geo = await geocodeAddress(addr);
+        geo = await geocodeAddress(addr, newZip);
     } catch (err) {
         alert(err.message);
         return;
@@ -303,7 +303,7 @@ async function saveNewLocation() {
 
     let geo;
     try {
-        geo = await geocodeAddress(addr);
+        geo = await geocodeAddress(addr, zipcity);
     } catch (err) {
         alert(err.message);
         return;
@@ -330,7 +330,13 @@ async function saveNewLocation() {
 // -------------------------------
 // GEOCODING FUNCTION (Nominatim API)
 // -------------------------------
-async function geocodeAddress(address) {
+async function geocodeAddress(address, zipcity) {
+    // Extract input postal code
+    const inputPLZ = zipcity.match(/\b1\d{4}\b/);
+    if (!inputPLZ) {
+        throw new Error("Invalid postal code format in input.");
+    }
+
     // Request addressdetails=1 to get structured data (city, postcode, etc.)
     const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(address)}`;
 
@@ -361,6 +367,12 @@ async function geocodeAddress(address) {
 
     if (!berlinMatch) {
         throw new Error("Location must be in Berlin (PLZ starting with 1).");
+    }
+
+    // 3. Validate that returned PLZ matches input PLZ
+    const returnedPLZ = berlinMatch.address.postcode;
+    if (returnedPLZ !== inputPLZ[0]) {
+        throw new Error(`Postal code mismatch: You entered '${inputPLZ[0]}', but the address is in '${returnedPLZ}'. Please use the correct postal code for this street.`);
     }
 
     return {
