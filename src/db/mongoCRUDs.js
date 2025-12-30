@@ -1,17 +1,17 @@
 import { MongoClient, ObjectId } from "mongodb";
+import 'dotenv/config';
 
-// Replace db_user, db_pass, db_name with your credentials
-// Diese Werte müssen mit den Daten von ocean.f4.htw-berlin.de ausgefüllt werden
-const db_user = 'sustainberlin_admin';
-const db_pass = 'SNWQQGlNb';
-const db_name = 'sustainberlin';
+// Credentials aus .env Datei laden (nicht im Git!)
+const db_user = process.env.DB_USER;
+const db_pass = process.env.DB_PASS;
+const db_name = process.env.DB_NAME;
 
 // Collection names
 const users_collection = 'users';
 const locations_collection = 'locations';
 
-const dbHostname = "mongodb1.f4.htw-berlin.de";
-const dbPort = 27017;
+const dbHostname = process.env.DB_HOST || "mongodb1.f4.htw-berlin.de";
+const dbPort = process.env.DB_PORT || 27017;
 const uri = `mongodb://${db_user}:${db_pass}@${dbHostname}:${dbPort}/${db_name}`;
 
 // ===========================

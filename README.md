@@ -34,13 +34,17 @@ npm install
 
 ## Konfiguration
 
-Bevor die App gestartet werden kann, müssen die MongoDB-Credentials in `src/db/mongoCRUDs.js` eingetragen werden:
+Erstelle eine `.env` Datei im Projektroot mit deinen MongoDB-Credentials:
 
-```javascript
-const db_user = 'DEIN_BENUTZERNAME';
-const db_pass = 'DEIN_PASSWORT';
-const db_name = 'DEIN_DATENBANKNAME';
+```env
+DB_USER=dein_benutzername
+DB_PASS=dein_passwort
+DB_NAME=sustainberlin
+DB_HOST=mongodb1.f4.htw-berlin.de
+DB_PORT=27017
 ```
+
+> ⚠️ **Wichtig:** Die `.env` Datei wird durch `.gitignore` nicht ins Repository gepusht!
 
 ---
 
