@@ -2,10 +2,11 @@
   "name": "sustainberlin",
   "version": "1.0.0",
   "description": "**App-Name:** SustainBerlin   **Team:** Denis Olf (@diskodenso), <Teampartner>   **Matrikelnummer(n):** s0590296, <Matrikel Teampartner>",
-  "main": "index.js",
+  "main": "src/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "http-server ./public -p 8080"
+    "start": "node src/server.js",
+    "start-static": "http-server ./public -p 8080"
   },
   "repository": {
     "type": "git",
@@ -14,13 +15,14 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/diskodenso/SustainBerlin/issues"
   },
   "homepage": "https://github.com/diskodenso/SustainBerlin#readme",
   "dependencies": {
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "mongodb": "^6.12.0"
   },
   "devDependencies": {
     "http-server": "^14.1.1"

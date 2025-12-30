@@ -1,51 +1,12 @@
 // -------------------------------
-// INITIAL DATA
+// INITIAL STATE
 // -------------------------------
 
-// Allowed users
-const USERS = [
-    { username: "admina", password: "password", role: "admin", name: "Mina" },
-    { username: "normalo", password: "password", role: "non-admin", name: "Norman" }
-];
+// Kein hartcodiertes USERS Array mehr - Login wird über API validiert
+// Kein hartcodiertes locations Array mehr - wird von API geladen
 
 let currentUser = null;
-
-// Example locations (3 real Berlin locations)
-let locations = [
-    {
-        id: 1,
-        title: "Tempelhofer Feld",
-        description: "Großes offenes Feld mit Hitzeinseln.",
-        street: "Tempelhofer Damm 1",
-        zipcity: "12101 Berlin",
-        category: "Air Quality",
-        image: "assets/img/tempelhof.jpg",
-        lat: 52.473,
-        lon: 13.403
-    },
-    {
-        id: 2,
-        title: "Mauerpark",
-        description: "Hohe Nutzung, wenig Schattenflächen.",
-        street: "Bernauer Str. 63",
-        zipcity: "13355 Berlin",
-        category: "Pedestrians",
-        image: "assets/img/mauerpark.jpg",
-        lat: 52.543,
-        lon: 13.402
-    },
-    {
-        id: 3,
-        title: "Recyclinghof Reinickendorf",
-        description: "Hohe Verkehrsbelastung durch Anlieferungen.",
-        street: "Lengeder Str. 6",
-        zipcity: "13407 Berlin",
-        category: "Industrial Facilities",
-        image: "assets/img/recycling.jpg",
-        lat: 52.574,
-        lon: 13.343
-    }
-];
+let locations = []; // Wird von API geladen
 
 
 // -------------------------------
@@ -58,23 +19,62 @@ function showScreen(id) {
 
 
 // -------------------------------
-// LOGIN
+// LOGIN (via API)
 // -------------------------------
-function handleLogin() {
-    const u = document.getElementById("login-username").value.trim();
-    const p = document.getElementById("login-password").value.trim();
+async function handleLogin() {
+    const username = document.getElementById("login-username").value.trim();
+    const password = document.getElementById("login-password").value.trim();
 
-    const user = USERS.find(x => x.username === u && x.password === p);
+    try {
+        const response = await fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+        });
 
-    if (!user) {
-        alert("Invalid username or password.");
-        return;
+        if (response.status === 401) {
+            alert("Invalid username or password.");
+            return;
+        }
+
+        if (!response.ok) {
+            alert("Login failed. Please try again.");
+            return;
+        }
+
+        // Erfolgreicher Login - User-Objekt aus Response
+        currentUser = await response.json();
+
+        // Locations laden und Main Screen anzeigen
+        await loadLocations();
+        renderMainScreen();
+        showScreen("main");
+
+    } catch (error) {
+        console.error("Login error:", error);
+        alert("Network error. Please try again.");
     }
+}
 
-    currentUser = user;
 
-    renderMainScreen();
-    showScreen("main");
+// -------------------------------
+// LOAD LOCATIONS (via API)
+// -------------------------------
+async function loadLocations() {
+    try {
+        const response = await fetch('/loc');
+        if (response.ok) {
+            locations = await response.json();
+        } else {
+            console.error("Failed to load locations");
+            locations = [];
+        }
+    } catch (error) {
+        console.error("Error loading locations:", error);
+        locations = [];
+    }
 }
 
 
@@ -114,13 +114,15 @@ function renderMainScreen() {
 
     locations.forEach(loc => {
         const li = document.createElement("li");
+        // Verwende _id von MongoDB oder id falls vorhanden
+        const locId = loc._id || loc.id;
         li.innerHTML = `
-            <strong>${loc.title}</strong><br/>
-            ${loc.street}, ${loc.zipcity}<br/>
+            <strong>${loc.name}</strong><br/>
+            ${loc.street}, ${loc.zip} ${loc.city}<br/>
             ${loc.category}<br/>
             ${loc.image ? `<img src="${loc.image}" />` : ""}
         `;
-        li.onclick = () => openDetails(loc.id);
+        li.onclick = () => openDetails(locId);
         list.appendChild(li);
     });
 }
@@ -131,6 +133,7 @@ function renderMainScreen() {
 // -------------------------------
 function logout() {
     currentUser = null;
+    locations = [];
     showScreen("login");
 }
 
@@ -141,31 +144,31 @@ function logout() {
 let currentDetailsId = null;
 
 function openDetails(id) {
-    const loc = locations.find(l => l.id === id);
+    const loc = locations.find(l => (l._id || l.id) === id);
     currentDetailsId = id;
 
     const form = document.getElementById("details-form");
 
-    // immer erstmal alles wieder aktivieren
+    // Alle Felder aktivieren
     [...form.querySelectorAll("input, textarea, select")].forEach(i => {
         i.disabled = false;
         if (i.readOnly) {
-            // readOnly bleibt readOnly
             i.disabled = false;
         }
     });
 
-    form.title.value = loc.title;
-    form.description.value = loc.description;
-    form.street.value = loc.street;
-    form.zipcity.value = loc.zipcity;
-    form.category.value = loc.category;
+    // Felder befüllen (Mapping von DB-Feldern)
+    form.title.value = loc.name || "";
+    form.description.value = loc.description || "";
+    form.street.value = loc.street || "";
+    form.zipcity.value = `${loc.zip || ""} ${loc.city || ""}`.trim();
+    form.category.value = loc.category || "";
     form.image.value = loc.image || "";
-    form.lat.value = loc.lat;
-    form.lon.value = loc.lon;
+    form.lat.value = loc.lat || "";
+    form.lon.value = loc.lng || "";
 
     document.getElementById("details-img").src = loc.image || "";
-    document.getElementById("details-caption").textContent = loc.title;
+    document.getElementById("details-caption").textContent = loc.name || "";
 
     // Set action buttons
     const actions = document.getElementById("details-actions");
@@ -209,69 +212,116 @@ function openDetails(id) {
 
 
 // -------------------------------
-// DELETE LOCATION
+// DELETE LOCATION (via API)
 // -------------------------------
-function deleteLocation() {
+async function deleteLocation() {
     if (!confirm("Delete this location?")) return;
 
-    locations = locations.filter(l => l.id !== currentDetailsId);
-    renderMainScreen();
-    showScreen("main");
+    try {
+        const response = await fetch(`/loc/${currentDetailsId}`, {
+            method: 'DELETE'
+        });
+
+        if (response.status === 204) {
+            // Erfolgreich gelöscht - Locations neu laden
+            await loadLocations();
+            renderMainScreen();
+            showScreen("main");
+        } else {
+            alert("Failed to delete location.");
+        }
+    } catch (error) {
+        console.error("Error deleting location:", error);
+        alert("Network error. Please try again.");
+    }
 }
 
 
 // -------------------------------
-// UPDATE LOCATION
+// UPDATE LOCATION (via API)
 // -------------------------------
 async function updateLocation() {
     const form = document.getElementById("details-form");
-    const loc = locations.find(l => l.id === currentDetailsId);
+    const loc = locations.find(l => (l._id || l.id) === currentDetailsId);
 
     if (!loc) return;
 
-    // read values into temp variables
+    // Read values from form
     const newTitle = form.title.value.trim();
     const newDesc = form.description.value.trim();
     const newStreet = form.street.value.trim();
-    const newZip = form.zipcity.value.trim();
+    const newZipcity = form.zipcity.value.trim();
     const newCat = form.category.value.trim();
     const newImage = form.image.value.trim();
 
+    // Check required fields
+    if (!newTitle || !newStreet || !newZipcity || !newCat) {
+        alert("Please fill in all required fields.");
+        return;
+    }
+
     // Validate Input
-    const validation = validateAddressInput(newStreet, newZip);
+    const validation = validateAddressInput(newStreet, newZipcity);
     if (!validation.valid) {
         alert(validation.error);
         return;
     }
 
-    // geocode new address
-    const addr = `${newStreet}, ${newZip}`;
+    // Geocode new address
+    const addr = `${newStreet}, ${newZipcity}`;
 
     let geo;
     try {
-        geo = await geocodeAddress(addr, newZip);
+        geo = await geocodeAddress(addr, newZipcity);
     } catch (err) {
         alert(err.message);
         return;
     }
 
-    // Update location only after success
-    loc.title = newTitle;
-    loc.description = newDesc;
-    loc.street = newStreet;
-    loc.zipcity = newZip;
-    loc.category = newCat;
-    loc.image = newImage;
-    loc.lat = geo.lat;
-    loc.lon = geo.lon;
+    // Parse zip and city from zipcity field
+    const zipMatch = newZipcity.match(/\d{5}/);
+    const zip = zipMatch ? zipMatch[0] : "";
+    const city = newZipcity.replace(/\d{5}/, "").trim();
 
-    renderMainScreen();
-    showScreen("main");
+    // Prepare updated location object for API
+    const updatedLocation = {
+        name: newTitle,
+        description: newDesc,
+        street: newStreet,
+        zip: zip,
+        city: city,
+        category: newCat,
+        image: newImage,
+        lat: geo.lat.toString(),
+        lng: geo.lon.toString()
+    };
+
+    try {
+        const response = await fetch(`/loc/${currentDetailsId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedLocation)
+        });
+
+        if (response.status === 204) {
+            // Erfolgreich aktualisiert - Locations neu laden
+            await loadLocations();
+            renderMainScreen();
+            showScreen("main");
+        } else {
+            alert("Failed to update location.");
+        }
+    } catch (error) {
+        console.error("Error updating location:", error);
+        alert("Network error. Please try again.");
+    }
 }
 
 
 // -------------------------------
-// ADD NEW LOCATION
+// ADD NEW LOCATION (via API)
 // -------------------------------
 function clearAddForm() {
     const f = document.getElementById("add-form");
@@ -309,21 +359,46 @@ async function saveNewLocation() {
         return;
     }
 
-    locations.push({
-        id: Date.now(),
-        title,
-        description,
-        street,
-        zipcity,
-        category,
-        image,
-        lat: geo.lat,
-        lon: geo.lon
-    });
+    // Parse zip and city from zipcity field
+    const zipMatch = zipcity.match(/\d{5}/);
+    const zip = zipMatch ? zipMatch[0] : "";
+    const city = zipcity.replace(/\d{5}/, "").trim();
 
-    f.reset();
-    renderMainScreen();
-    showScreen("main");
+    // Prepare new location object for API (ohne ID!)
+    const newLocation = {
+        name: title,
+        description: description,
+        street: street,
+        zip: zip,
+        city: city,
+        category: category,
+        image: image,
+        lat: geo.lat.toString(),
+        lng: geo.lon.toString()
+    };
+
+    try {
+        const response = await fetch('/loc', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newLocation)
+        });
+
+        if (response.status === 201) {
+            // Erfolgreich angelegt - Locations neu laden
+            f.reset();
+            await loadLocations();
+            renderMainScreen();
+            showScreen("main");
+        } else {
+            alert("Failed to create location.");
+        }
+    } catch (error) {
+        console.error("Error creating location:", error);
+        alert("Network error. Please try again.");
+    }
 }
 
 
@@ -352,7 +427,6 @@ async function geocodeAddress(address, zipcity) {
         if (!a) return false;
 
         // 1. Check for "Berlin" in state/city/town/village
-        // Note: In Nominatim, Berlin is usually the state (Bundesland) and city.
         const isBerlin = (
             (a.state && a.state.includes("Berlin")) ||
             (a.city && a.city.includes("Berlin")) ||
