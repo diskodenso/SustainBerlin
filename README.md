@@ -44,7 +44,7 @@ DB_HOST=mongodb1.f4.htw-berlin.de
 DB_PORT=27017
 ```
 
-> ⚠️ **Wichtig:** Die `.env` Datei wird durch `.gitignore` nicht ins Repository gepusht!
+> **Wichtig:** Die `.env` Datei wird durch `.gitignore` nicht ins Repository gepusht!
 
 ---
 
@@ -94,7 +94,7 @@ DELETE /loc/:id      → Standort löschen (204)
 SustainBerlin/
 ├── public/                  # Frontend (statische Dateien)
 │   ├── index.html          # SPA HTML
-│   ├── css/styles.css      # Styling
+│   ├── css/style.css       # Styling
 │   └── js/script.js        # Frontend-Logik mit API-Calls
 ├── src/                     # Backend
 │   ├── server.js           # Express Server
