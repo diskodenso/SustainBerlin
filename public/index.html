@@ -5,6 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>SustainBerlin – Prototype</title>
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <link rel="stylesheet" href="css/style.css" />
 </head>
 
@@ -40,9 +45,17 @@
                 <!-- Normal user gets only Logout -->
             </div>
 
-            <ul class="locations" id="location-list">
-                <!-- Filled dynamically -->
-            </ul>
+            <!-- Split Layout: List (Left) - Map (Right) -->
+            <div class="main-content-split">
+                <div class="list-container">
+                    <ul class="locations" id="location-list">
+                        <!-- Filled dynamically -->
+                    </ul>
+                </div>
+                <div class="map-container" id="map-view">
+                    <!-- Map will be rendered here -->
+                </div>
+            </div>
         </section>
 
         <!-- ADD LOCATION SCREEN -->
@@ -72,8 +85,8 @@
                         <option>Industrial Facilities</option>
                     </select>
                 </label>
-                <label>Image URL
-                    <input type="text" name="image" placeholder="images/..." />
+                <label>Image (Upload)
+                    <input type="file" name="image" accept="image/*" />
                 </label>
 
                 <div class="actions">
@@ -110,8 +123,8 @@
                     </select>
                 </label>
 
-                <label>Image URL
-                    <input type="text" name="image" placeholder="images/..." />
+                <label>Image (Upload)
+                    <input type="file" name="image" accept="image/*" />
                 </label>
 
                 <label>Latitude
@@ -123,6 +136,7 @@
 
                 <figure>
                     <img id="details-img" alt="Preview" />
+                    <button type="button" id="btn-remove-image" class="btn-danger">Remove Image</button>
                     <figcaption id="details-caption"></figcaption>
                 </figure>
 
@@ -133,12 +147,36 @@
             </form>
         </section>
 
+        <!-- IMPRINT SCREEN -->
+        <section class="screen" id="imprint">
+            <h2>Imprint</h2>
+            <p><strong>Operator:</strong><br>
+                SustainBerlin Ltd.<br>
+                Green Street 1<br>
+                10115 Berlin</p>
+            <p><strong>Contact:</strong><br>
+                Email: info@sustainberlin.example.com</p>
+            <div class="actions">
+                <button type="button" onclick="closeInfoScreen()">Back</button>
+            </div>
+        </section>
+
+        <!-- PRIVACY POLICY SCREEN -->
+        <section class="screen" id="privacy">
+            <h2>Privacy Policy</h2>
+            <p>We take your privacy seriously. This prototype stores minimal data (username, locations).</p>
+            <p>Images uploaded are stored on our server.</p>
+            <div class="actions">
+                <button type="button" onclick="closeInfoScreen()">Back</button>
+            </div>
+        </section>
+
     </main>
 
     <!-- GLOBAL FOOTER -->
     <footer class="global-footer">
-        <a href="#">Imprint</a> ·
-        <a href="#">Privacy Policy</a>
+        <a href="#" id="footer-imprint">Imprint</a> ·
+        <a href="#" id="footer-privacy">Privacy Policy</a>
     </footer>
 
     <script src="js/script.js"></script>
