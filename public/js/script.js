@@ -1,26 +1,20 @@
 // -------------------------------
 // INITIAL STATE
 // -------------------------------
-
-// Kein hartcodiertes USERS Array mehr - Login wird über API validiert
-// Kein hartcodiertes locations Array mehr - wird von API geladen
-
 let currentUser = null;
-let locations = []; // Wird von API geladen
-let map = null;     // Leaflet Map Instance
-let markers = {};   // Object to store markers by location ID
+let locations = [];
 
 // -------------------------------
 // SPA NAVIGATION
 // -------------------------------
 function showScreen(id) {
-    document.querySelectorAll(".screen").forEach(s => s.style.display = "none");
+    const screens = document.querySelectorAll(".screen");
+    screens.forEach(screen => screen.style.display = "none");
     document.getElementById(id).style.display = "block";
 }
 
-
 // -------------------------------
-// LOGIN (via API)
+// LOGIN
 // -------------------------------
 async function handleLogin() {
     const username = document.getElementById("login-username").value.trim();
@@ -28,11 +22,9 @@ async function handleLogin() {
 
     try {
         const response = await fetch('/login', {
-            method: 'POST',
-            headers: {
+            method: 'POST', headers: {
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, password })
+            }, body: JSON.stringify({username, password})
         });
 
         if (response.status === 401) {
@@ -59,56 +51,8 @@ async function handleLogin() {
     }
 }
 
-
-
 // -------------------------------
-// MAP FUNCTIONALITY
-// -------------------------------
-function initMap() {
-    if (map) return; // Schon initialisiert
-
-    // Berlin Center
-    map = L.map('map-view').setView([52.5200, 13.4050], 11);
-
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
-}
-
-function updateMapMarkers() {
-    if (!map) return;
-
-    // Clear existing markers
-    for (let id in markers) {
-        map.removeLayer(markers[id]);
-    }
-    markers = {};
-
-    // Add new markers
-    locations.forEach(loc => {
-        if (loc.lat && loc.lng) {
-            const id = loc._id || loc.id;
-            const marker = L.marker([parseFloat(loc.lat), parseFloat(loc.lng)]).addTo(map);
-
-            // Popup Info with Link
-            const popupContent = `
-                <b>${loc.name}</b><br>
-                ${loc.category}<br>
-                <button onclick="openDetails('${id}')" class="popup-btn">Details</button>
-            `;
-            marker.bindPopup(popupContent);
-
-            // Click Event -> Open Details NOT directly anymore
-            // marker.on('click', () => { openDetails(id); });
-
-            markers[id] = marker;
-        }
-    });
-}
-
-// -------------------------------
-// LOAD LOCATIONS (via API)
+// LOAD LOCATIONS
 // -------------------------------
 async function loadLocations() {
     try {
@@ -129,7 +73,6 @@ async function loadLocations() {
         locations = [];
     }
 }
-
 
 // -------------------------------
 // MAIN SCREEN RENDERING
@@ -161,13 +104,8 @@ function renderMainScreen() {
     logoutBtn.onclick = logout;
     actions.appendChild(logoutBtn);
 
-    // Render location list
-    const list = document.getElementById("location-list");
-    list.innerHTML = "";
-
-    locations.forEach(loc => {
+    function createLocationItem(loc) {
         const li = document.createElement("li");
-        // Verwende _id von MongoDB oder id falls vorhanden
         const locId = loc._id || loc.id;
         li.innerHTML = `
             <strong>${loc.name}</strong><br/>
@@ -181,38 +119,13 @@ function renderMainScreen() {
         li.addEventListener('mouseleave', () => unhighlightMarker(locId));
 
         li.onclick = () => openDetails(locId);
-        list.appendChild(li);
-    });
-
-    // Map initialisieren und Marker setzen
-    // Timeout needed to ensuring DOM is visible for Leaflet size calculation
-    setTimeout(() => {
-        initMap();
-        map.invalidateSize(); // Wichtig wenn Map in hidden Element war
-        updateMapMarkers();
-    }, 100);
-}
-
-
-// -------------------------------
-// MAP INTERACTIVITY
-// -------------------------------
-function highlightMarker(id) {
-    const marker = markers[id];
-    if (marker) {
-        marker.openPopup();
-        marker._icon.classList.add("marker-highlight");
+        return li;
     }
-}
 
-function unhighlightMarker(id) {
-    const marker = markers[id];
-    if (marker) {
-        marker.closePopup();
-        marker._icon.classList.remove("marker-highlight");
-    }
+    const list = document.getElementById("location-list");
+    list.innerHTML = "";
+    locations.forEach(loc => list.appendChild(createLocationItem(loc)));
 }
-
 
 // -------------------------------
 // LOGOUT
@@ -222,7 +135,6 @@ function logout() {
     locations = [];
     showScreen("login");
 }
-
 
 // -------------------------------
 // DETAILS SCREEN
@@ -239,12 +151,11 @@ function openDetails(id) {
     const form = document.getElementById("details-form");
 
     // Alle Felder aktivieren
-    [...form.querySelectorAll("input, textarea, select")].forEach(i => {
-        i.disabled = false;
-        if (i.readOnly) {
-            i.disabled = false;
-        }
-    });
+    function setFormDisabled(form, disabled = true) {
+        [...form.querySelectorAll("input, textarea, select")].forEach(i => i.disabled = disabled);
+    }
+
+    setFormDisabled(form, false);
 
     // Felder befüllen (Mapping von DB-Feldern)
     form.title.value = loc.name || "";
@@ -324,15 +235,14 @@ function openDetails(id) {
         actions.appendChild(close);
 
         // make form readonly
-        [...form.querySelectorAll("input, textarea, select")].forEach(i => i.disabled = true);
+        setFormDisabled(form, true);
     }
 
     showScreen("details");
 }
 
-
 // -------------------------------
-// DELETE LOCATION (via API)
+// DELETE LOCATION
 // -------------------------------
 async function deleteLocation() {
     if (!confirm("Delete this location?")) return;
@@ -356,9 +266,8 @@ async function deleteLocation() {
     }
 }
 
-
 // -------------------------------
-// UPDATE LOCATION (via API)
+// UPDATE LOCATION
 // -------------------------------
 async function updateLocation() {
     const form = document.getElementById("details-form");
@@ -394,7 +303,6 @@ async function updateLocation() {
 
     // Geocode new address
     const addr = `${newStreet}, ${newZipcity}`;
-
     let geo;
     try {
         geo = await geocodeAddress(addr, newZipcity);
@@ -403,35 +311,31 @@ async function updateLocation() {
         return;
     }
 
-    // Parse zip and city
-    const zipMatch = newZipcity.match(/\d{5}/);
-    const zip = zipMatch ? zipMatch[0] : "";
-    const city = newZipcity.replace(/\d{5}/, "").trim();
-
-    // Prepare FormData
-    const formData = new FormData();
-    formData.append("name", newTitle);
-    formData.append("description", newDesc);
-    formData.append("street", newStreet);
-    formData.append("zip", zip);
-    formData.append("city", city);
-    formData.append("category", newCat);
-    formData.append("lat", geo.lat.toString());
-    formData.append("lng", geo.lon.toString());
-
-    if (imageFile) {
-        formData.append("image", imageFile);
+    // helper function to parse zip and city
+    function parseZipCity(zipcity) {
+        const zipMatch = zipcity.match(/\d{5}/);
+        return { zip: zipMatch ? zipMatch[0] : "", city: zipcity.replace(/\d{5}/, "").trim() };
     }
 
-    // Check delete flag
-    if (form.dataset.deleteImage === "true") {
-        formData.append("deleteImage", "true");
-    }
+    const { zip, city } = parseZipCity(newZipcity);
+    // Prepare updated location object for API
+    const updatedLocation = {
+        name: newTitle,
+        description: newDesc,
+        street: newStreet,
+        zip: zip,
+        city: city,
+        category: newCat,
+        image: newImage,
+        lat: geo.lat.toString(),
+        lng: geo.lon.toString()
+    };
 
     try {
         const response = await fetch(`/loc/${currentDetailsId}`, {
-            method: 'PUT',
-            body: formData
+            method: 'PUT', headers: {
+                'Content-Type': 'application/json'
+            }, body: JSON.stringify(updatedLocation)
         });
 
         if (response.status === 204) {
@@ -447,9 +351,8 @@ async function updateLocation() {
     }
 }
 
-
 // -------------------------------
-// ADD NEW LOCATION (via API)
+// ADD NEW LOCATION
 // -------------------------------
 function clearAddForm() {
     const f = document.getElementById("add-form");
@@ -473,14 +376,13 @@ async function saveNewLocation() {
         return;
     }
 
-    const addr = `${street}, ${zipcity}`;
-
     const validation = validateAddressInput(street, zipcity);
     if (!validation.valid) {
         alert(validation.error);
         return;
     }
 
+    const addr = `${street}, ${zipcity}`;
     let geo;
     try {
         geo = await geocodeAddress(addr, zipcity);
@@ -489,10 +391,11 @@ async function saveNewLocation() {
         return;
     }
 
-    // Parse zip and city
-    const zipMatch = zipcity.match(/\d{5}/);
-    const zip = zipMatch ? zipMatch[0] : "";
-    const city = zipcity.replace(/\d{5}/, "").trim();
+    function parseZipCity(zipcity) {
+        const zipMatch = zipcity.match(/\d{5}/);
+        return { zip: zipMatch ? zipMatch[0] : "", city: zipcity.replace(/\d{5}/, "").trim() };
+    }
+    const { zip, city } = parseZipCity(zipcity);
 
     // Prepare FormData
     const formData = new FormData();
@@ -513,8 +416,9 @@ async function saveNewLocation() {
         // NOTE: Do NOT set Content-Type header manually when sending FormData,
         // fetch will set it automatically with the correct boundary!
         const response = await fetch('/loc', {
-            method: 'POST',
-            body: formData
+            method: 'POST', headers: {
+                'Content-Type': 'application/json'
+            }, body: JSON.stringify(newLocation)
         });
 
         if (response.status === 201) {
@@ -531,7 +435,6 @@ async function saveNewLocation() {
     }
 }
 
-
 // -------------------------------
 // GEOCODING FUNCTION (Nominatim API)
 // -------------------------------
@@ -545,7 +448,7 @@ async function geocodeAddress(address, zipcity) {
     // Request addressdetails=1 to get structured data (city, postcode, etc.)
     const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(address)}`;
 
-    const res = await fetch(url, { headers: { "Accept-Language": "de" } });
+    const res = await fetch(url, {headers: {"Accept-Language": "de"}});
     if (!res.ok) throw new Error("Network error accessing Geocoding service.");
 
     const data = await res.json();
@@ -557,11 +460,7 @@ async function geocodeAddress(address, zipcity) {
         if (!a) return false;
 
         // 1. Check for "Berlin" in state/city/town/village
-        const isBerlin = (
-            (a.state && a.state.includes("Berlin")) ||
-            (a.city && a.city.includes("Berlin")) ||
-            (a.town && a.town.includes("Berlin"))
-        );
+        const isBerlin = ((a.state && a.state.includes("Berlin")) || (a.city && a.city.includes("Berlin")) || (a.town && a.town.includes("Berlin")));
 
         // 2. Check PLZ starts with "1" (Berlin PLZ range is approx 10xxx - 14xxx)
         const validPLZ = a.postcode && a.postcode.startsWith("1");
@@ -580,30 +479,28 @@ async function geocodeAddress(address, zipcity) {
     }
 
     return {
-        lat: parseFloat(berlinMatch.lat),
-        lon: parseFloat(berlinMatch.lon)
+        lat: parseFloat(berlinMatch.lat), lon: parseFloat(berlinMatch.lon)
     };
 }
 
 function validateAddressInput(street, zipcity) {
     // 1. Check for House Number (at least one digit in street)
     if (!/\d/.test(street)) {
-        return { valid: false, error: "Please enter a house number in the street field." };
+        return {valid: false, error: "Please enter a house number in the street field."};
     }
 
     // 2. Check for "Berlin" (case-insensitive)
     if (!/Berlin/i.test(zipcity)) {
-        return { valid: false, error: "City must be 'Berlin'." };
+        return {valid: false, error: "City must be 'Berlin'."};
     }
 
     // 3. Check for PLZ starting with 1 (5 digits)
     if (!/\b1\d{4}\b/.test(zipcity)) {
-        return { valid: false, error: "Postal code must start with '1' (Berlin code)." };
+        return {valid: false, error: "Postal code must start with '1' (Berlin code)."};
     }
 
-    return { valid: true };
+    return {valid: true};
 }
-
 
 // -------------------------------
 // INIT
