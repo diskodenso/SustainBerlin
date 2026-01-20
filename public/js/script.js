@@ -59,6 +59,11 @@ async function loadLocations() {
         const response = await fetch('/loc');
         if (response.ok) {
             locations = await response.json();
+            // Update Map after loading locations
+            if (document.getElementById('map-view').offsetParent !== null) {
+                // Nur updaten wenn Map sichtbar ist (oder zumindest initialisiert)
+                // Da wir SPA sind, müssen wir sicherstellen, dass initMap gerufen wurde
+            }
         } else {
             console.error("Failed to load locations");
             locations = [];
@@ -108,6 +113,11 @@ function renderMainScreen() {
             ${loc.category}<br/>
             ${loc.image ? `<img src="${loc.image}" />` : ""}
         `;
+
+        // Hover -> Highlight Marker
+        li.addEventListener('mouseenter', () => highlightMarker(locId));
+        li.addEventListener('mouseleave', () => unhighlightMarker(locId));
+
         li.onclick = () => openDetails(locId);
         return li;
     }
@@ -131,6 +141,9 @@ function logout() {
 // -------------------------------
 let currentDetailsId = null;
 
+// Make openDetails globally available for Map Popup Buttons
+window.openDetails = openDetails;
+
 function openDetails(id) {
     const loc = locations.find(l => (l._id || l.id) === id);
     currentDetailsId = id;
@@ -150,12 +163,43 @@ function openDetails(id) {
     form.street.value = loc.street || "";
     form.zipcity.value = `${loc.zip || ""} ${loc.city || ""}`.trim();
     form.category.value = loc.category || "";
-    form.image.value = loc.image || "";
+    // Bei File Input kann man value nicht setzen (Security), also reset
+    form.image.value = "";
     form.lat.value = loc.lat || "";
     form.lon.value = loc.lng || "";
 
-    document.getElementById("details-img").src = loc.image || "";
+    const imgPreview = document.getElementById("details-img");
+    const removeBtn = document.getElementById("btn-remove-image");
+
+    // Reset Remove Logic
+    form.dataset.deleteImage = "false";
+
+    if (loc.image) {
+        imgPreview.src = loc.image;
+        imgPreview.style.display = "block";
+        // Show remove button only for admin
+        if (currentUser && currentUser.role === "admin") {
+            removeBtn.style.display = "inline-block";
+        } else {
+            removeBtn.style.display = "none";
+        }
+    } else {
+        imgPreview.style.display = "none";
+        imgPreview.src = "";
+        removeBtn.style.display = "none";
+    }
     document.getElementById("details-caption").textContent = loc.name || "";
+
+    // Remove Button Click
+    removeBtn.onclick = () => {
+        if (confirm("Remove this image? (Will be saved on Update)")) {
+            imgPreview.style.display = "none";
+            imgPreview.src = "";
+            removeBtn.style.display = "none";
+            form.image.value = ""; // Clear file input if any
+            form.dataset.deleteImage = "true"; // Set Flag
+        }
+    };
 
     // Set action buttons
     const actions = document.getElementById("details-actions");
@@ -237,7 +281,12 @@ async function updateLocation() {
     const newStreet = form.street.value.trim();
     const newZipcity = form.zipcity.value.trim();
     const newCat = form.category.value.trim();
-    const newImage = form.image.value.trim();
+
+    // File Input (Details form)
+    // Note: You need to change input type="text" to "file" in HTML first!
+    // But assuming we have a file input there or will add one.
+    // Let's assume input name="image" is becoming type="file"
+    const imageFile = form.image.files ? form.image.files[0] : null;
 
     // Check required fields
     if (!newTitle || !newStreet || !newZipcity || !newCat) {
@@ -290,7 +339,6 @@ async function updateLocation() {
         });
 
         if (response.status === 204) {
-            // Erfolgreich aktualisiert - Locations neu laden
             await loadLocations();
             renderMainScreen();
             showScreen("main");
@@ -319,7 +367,9 @@ async function saveNewLocation() {
     const street = f.street.value.trim();
     const zipcity = f.zipcity.value.trim();
     const category = f.category.value.trim();
-    const image = f.image.value.trim();
+
+    // File Input
+    const imageFile = f.image.files[0];
 
     if (!title || !street || !zipcity || !category) {
         alert("Please fill in all required fields.");
@@ -347,20 +397,24 @@ async function saveNewLocation() {
     }
     const { zip, city } = parseZipCity(zipcity);
 
-    // Prepare new location object for API (ohne ID!)
-    const newLocation = {
-        name: title,
-        description: description,
-        street: street,
-        zip: zip,
-        city: city,
-        category: category,
-        image: image,
-        lat: geo.lat.toString(),
-        lng: geo.lon.toString()
-    };
+    // Prepare FormData
+    const formData = new FormData();
+    formData.append("name", title);
+    formData.append("description", description);
+    formData.append("street", street);
+    formData.append("zip", zip);
+    formData.append("city", city);
+    formData.append("category", category);
+    formData.append("lat", geo.lat.toString());
+    formData.append("lng", geo.lon.toString());
+
+    if (imageFile) {
+        formData.append("image", imageFile);
+    }
 
     try {
+        // NOTE: Do NOT set Content-Type header manually when sending FormData,
+        // fetch will set it automatically with the correct boundary!
         const response = await fetch('/loc', {
             method: 'POST', headers: {
                 'Content-Type': 'application/json'
@@ -368,7 +422,6 @@ async function saveNewLocation() {
         });
 
         if (response.status === 201) {
-            // Erfolgreich angelegt - Locations neu laden
             f.reset();
             await loadLocations();
             renderMainScreen();
@@ -474,4 +527,26 @@ window.onload = () => {
     document.getElementById("add-cancel").addEventListener("click", () => {
         showScreen("main");
     });
+
+    // Footer Links
+    document.getElementById("footer-imprint").addEventListener("click", (e) => {
+        e.preventDefault();
+        showScreen("imprint");
+    });
+
+    document.getElementById("footer-privacy").addEventListener("click", (e) => {
+        e.preventDefault();
+        showScreen("privacy");
+    });
 };
+
+// Smart Back Navigation
+function closeInfoScreen() {
+    if (currentUser) {
+        showScreen("main");
+    } else {
+        showScreen("login");
+    }
+}
+// Make it global for HTML onclick
+window.closeInfoScreen = closeInfoScreen;

@@ -1,5 +1,5 @@
 :root {
-    --max: 900px;
+    --max: 1200px;
     --radius: 12px;
     --primary: #0d7377;
     --primary-dark: #014f56;
@@ -319,4 +319,82 @@ figcaption {
     figure img {
         max-height: 250px;
     }
+}
+
+/* --- Split Layout for Main Screen --- */
+.main-content-split {
+    display: flex;
+    gap: 40px;
+    /* Increased from 20px to 40px */
+    height: 600px;
+    /* Adjust as needed */
+    margin-top: 20px;
+}
+
+.list-container {
+    flex: 1;
+    /* 1/3 width approx */
+    overflow-y: auto;
+    border-right: 1px solid #ddd;
+    padding-right: 10px;
+}
+
+.map-container {
+    flex: 2;
+    /* 2/3 width approx */
+    background-color: #eee;
+    border-radius: 8px;
+    height: 100%;
+}
+
+/* Ensure map div takes full height of container */
+#map-view {
+    width: 100%;
+    height: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .main-content-split {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .map-container {
+        height: 300px;
+        order: -1;
+        /* Show map above list on mobile? Or keep below? */
+    }
+}
+
+/* Marker Highlight Effect */
+.marker-highlight {
+    filter: hue-rotate(120deg);
+    /* Change color slightly */
+    transform: scale(1.2) !important;
+    z-index: 1000 !important;
+}/* Popup Button */
+.popup-btn {
+    margin-top: 5px;
+    cursor: pointer;
+    padding: 5px 10px;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.popup-btn:hover {
+    background-color: var(--primary-dark);
+}/* Danger Button (Remove Image) */
+.btn-danger {
+    background-color: #cc0000;
+    margin-top: 5px;
+    display: none;
+    /* Hidden by default */
+}
+
+.btn-danger:hover {
+    background-color: #990000;
 }
