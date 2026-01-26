@@ -26,8 +26,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// GET /loc - Alle Standorte zurückschicken
-// Response: 200 + JSON Array mit allen Standorten
+// GET /loc - Return all locations
+// Response: 200 + JSON Array with all locations
 locationsRouter.get('/', async function (req, res) {
     try {
         const locations = await findAllLocations();
@@ -38,8 +38,8 @@ locationsRouter.get('/', async function (req, res) {
     }
 });
 
-// GET /loc/:id - Einzelnen Standort zurückschicken
-// Response: 200 + JSON Object mit Standort
+// GET /loc/:id - Return single location
+// Response: 200 + JSON Object with location
 locationsRouter.get('/:id', async function (req, res) {
     try {
         const location = await findLocationById(req.params.id);
@@ -54,9 +54,9 @@ locationsRouter.get('/:id', async function (req, res) {
     }
 });
 
-// POST /loc - Neuen Standort anlegen
-// Payload: Standort-Objekt OHNE ID
-// Response: 201 + Location-Header mit neuer ID
+// POST /loc - Create new location
+// Payload: Location object WITHOUT ID
+// Response: 201 + Location header with new ID
 locationsRouter.post('/', upload.single('image'), async function (req, res) {
     try {
         let newLocation = req.body;
@@ -76,8 +76,8 @@ locationsRouter.post('/', upload.single('image'), async function (req, res) {
     }
 });
 
-// PUT /loc/:id - Standort aktualisieren
-// Payload: Aktualisiertes Standort-Objekt
+// PUT /loc/:id - Update location
+// Payload: Updated location object
 // Response: 204 No Content
 locationsRouter.put('/:id', upload.single('image'), async function (req, res) {
     try {
@@ -128,7 +128,7 @@ locationsRouter.put('/:id', upload.single('image'), async function (req, res) {
     }
 });
 
-// DELETE /loc/:id - Standort löschen
+// DELETE /loc/:id - Delete location
 // Response: 204 No Content
 locationsRouter.delete('/:id', async function (req, res) {
     try {

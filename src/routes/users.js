@@ -3,12 +3,12 @@ import { findAllUsers, findOneUser } from '../db/mongoCRUDs.js';
 
 let usersRouter = Router();
 
-// Wird bei GET http://localhost:8000/users aufgerufen 
-usersRouter.get('/', async function(req, res) {
+// Called at GET http://localhost:8000/users 
+usersRouter.get('/', async function (req, res) {
   try {
     //let userDoc = await mongo_cruds.findOneUser("admina", "pass1234");
     let users = await findAllUsers();
-    if(users) {
+    if (users) {
       res.status(200).json(users);
     }
     else {
@@ -20,17 +20,17 @@ usersRouter.get('/', async function(req, res) {
   }
 });
 
-// Wird bei  
-// POST http://localhost:8000/users mit payload 
+// Called at
+// POST http://localhost:8000/users with payload 
 // {"username":"xyz", "password":"zyx"}
-// erwartet eine payload diesen ^^^ Formats 
-// der Header Content-Type: application/json MUSS mitgeschickt
+// expects a payload in this ^^^ format 
+// the header Content-Type: application/json MUST be sent
 // 
-usersRouter.post('/', async function(req, res) {
-  // wird automatisch in ein JS-Objekt umgewandelt, 
-  // wenn Content-Type: application/json gesetzt ist
-  let userToLogin = req.body;  
-  console.log (userToLogin);
+usersRouter.post('/', async function (req, res) {
+  // will be automatically converted to JS object, 
+  // when Content-Type: application/json is set
+  let userToLogin = req.body;
+  console.log(userToLogin);
   let user = await findOneUser(userToLogin.username, userToLogin.password);
   if (user) {
     res.status(200).json(user);

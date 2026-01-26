@@ -4,12 +4,12 @@ import { findOneUser } from '../db/mongoCRUDs.js';
 let loginRouter = Router();
 
 // POST /login
-// Akzeptiert und validiert die username/password-Kombination
-// Bei gültiger Kombi: 200 + User-Objekt (ohne Passwort)
-// Bei ungültiger Kombi: 401 Unauthorized
+// Accepts and validates the username/password combination
+// On valid credentials: 200 + User object (without password)
+// On invalid credentials: 401 Unauthorized
 loginRouter.post('/', async function (req, res) {
-    // Body wird automatisch in JS-Objekt umgewandelt,
-    // wenn Content-Type: application/json gesetzt ist
+    // Body is automatically converted to JS object
+    // when Content-Type: application/json is set
     const { username, password } = req.body;
 
     console.log(`Login attempt for user: ${username}`);
@@ -18,10 +18,10 @@ loginRouter.post('/', async function (req, res) {
         const user = await findOneUser(username, password);
 
         if (user) {
-            // Erfolgreicher Login - User-Objekt ohne Passwort zurückschicken
+            // Successful login - Send user object without password
             res.status(200).json(user);
         } else {
-            // Ungültige Credentials
+            // Invalid credentials
             res.status(401).send("Unauthorized");
         }
     } catch (err) {
