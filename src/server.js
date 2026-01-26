@@ -19,20 +19,20 @@ app.use(json());
  * Setting up the routes
  */
 
-// 1) http://localhost:8000/ shall fetch the index.html 
-// ../public is the directory for the static ressources
+// 1) http://localhost:8000/ serves the index.html 
+// ../public is the directory for static resources
 // GET http://localhost:8000/ or GET http://localhost:8000/index.html 
 // returns the index.html in /public
 app.use(expressStatic(join(import.meta.dirname, '../public')));
 app.use('/', indexRouter);
 
-// 2) http://localhost:8000/users (vom Template übernommen)
+// 2) http://localhost:8000/users (from template)
 app.use('/users', usersRouter);
 
 // 3) POST http://localhost:8000/login - Login Endpoint
 app.use('/login', loginRouter);
 
-// 4) http://localhost:8000/loc - CRUD für Locations
+// 4) http://localhost:8000/loc - CRUD for Locations
 app.use('/loc', locationsRouter);
 
 // 5) Send "Not found" for all other 'paths'

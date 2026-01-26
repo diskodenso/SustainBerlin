@@ -2,10 +2,10 @@ import { Router } from 'express';
 let indexRouter = Router();
 
 // GET http://localhost:8000/ 
-// Die index.html wird bereits durch express.static serviert
-// Dieser Router ist nur für Kompatibilität vorhanden
+// The index.html is already served by express.static
+// This router is only for compatibility
 indexRouter.get('/', function (req, res, next) {
-  // Weiterleiten an den nächsten Handler (express.static)
+  // Forward to the next handler (express.static)
   next();
 });
 
