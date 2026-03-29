@@ -327,10 +327,7 @@ async function updateLocation() {
     const newZipcity = form.zipcity.value.trim();
     const newCat = form.category.value.trim();
 
-    // File Input (Details form)
-    // Note: You need to change input type="text" to "file" in HTML first!
-    // But assuming we have a file input there or will add one.
-    // Let's assume input name="image" is becoming type="file"
+    // File Input
     const imageFile = form.image.files ? form.image.files[0] : null;
 
     // Check required fields
@@ -358,24 +355,31 @@ async function updateLocation() {
 
     // helper function to parse zip and city
     const { zip, city } = parseZipCity(newZipcity);
-    // Prepare updated location object for API
-    const updatedLocation = {
-        name: newTitle,
-        description: newDesc,
-        street: newStreet,
-        zip: zip,
-        city: city,
-        category: newCat,
-        image: newImage,
-        lat: geo.lat.toString(),
-        lng: geo.lon.toString()
-    };
+
+    // Prepare FormData
+    const formData = new FormData();
+    formData.append("name", newTitle);
+    formData.append("description", newDesc);
+    formData.append("street", newStreet);
+    formData.append("zip", zip);
+    formData.append("city", city);
+    formData.append("category", newCat);
+    formData.append("lat", geo.lat.toString());
+    formData.append("lng", geo.lon.toString());
+
+    if (imageFile) {
+        formData.append("image", imageFile);
+    }
+    
+    // Check if image should be deleted
+    if (form.dataset.deleteImage === "true") {
+        formData.append("deleteImage", "true");
+    }
 
     try {
         const response = await fetch(`/loc/${currentDetailsId}`, {
-            method: 'PUT', headers: {
-                'Content-Type': 'application/json'
-            }, body: JSON.stringify(updatedLocation)
+            method: 'PUT', 
+            body: formData // Verwende FormData statt JSON!
         });
 
         if (response.status === 204) {
